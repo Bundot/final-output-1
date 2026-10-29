@@ -1,0 +1,424 @@
+
+Step 1 · HTML5 DocType & Boilerplate
+index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tic-Tac-Toe</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+What?
+We are declaring standard HTML5 document metadata, responsive scaling, and linking our external stylesheet.
+
+Where?
+In index.html, right at the top inside the <head> tag before any visible UI elements.
+
+How?
+By setting <!DOCTYPE html> for standards mode, a viewport meta tag for mobile width parity, and a <link rel="stylesheet">.
+
+Why?
+Without DOCTYPE the browser defaults to Quirks Mode, and without the viewport tag mobile screens will zoom out and break touch play.
+
+
+
+Step 2 · Container & Status Banner
+index.html
+<body>
+  <div class="game-container">
+    <h1>Tic-Tac-Toe</h1>
+    <div class="status-banner" id="statusText">Player X's Turn</div>
+
+What?
+We are building the main shell and an active turn/winner feedback banner.
+
+Where?
+At the top of the <body> inside a wrapper called .game-container.
+
+How?
+By creating an <h1> for the title and a #statusText div which JavaScript will target dynamically on each turn.
+
+Why?
+Players need continuous feedback on whose turn it is and whether a move led to a win, draw, or switch.
+
+
+Step 3 · Scoreboard Cards
+index.html
+    <div class="scoreboard">
+      <div class="score-card player-x"><span class="label">Player X</span><span class="score" id="scoreX">0</span></div>
+      <div class="score-card ties"><span class="label">Ties</span><span class="score" id="scoreTie">0</span></div>
+      <div class="score-card player-o"><span class="label">Player O</span><span class="score" id="scoreO">0</span></div>
+    </div>
+
+What?
+We are creating 3 display cards to track Player X wins, total ties, and Player O wins.
+
+Where?
+Inside .game-container, directly under our status banner.
+
+How?
+By assigning unique IDs (scoreX, scoreTie, scoreO) to the score spans so JS can update numbers with zero layout shifts.
+
+Why?
+Separating labels from numeric values allows JS to update just text nodes without re-rendering card containers.
+
+
+
+Step 4 · 3x3 Grid Board & Controls
+index.html
+    <div class="board" id="board">
+      <div class="cell" data-index="0"></div><div class="cell" data-index="1"></div><div class="cell" data-index="2"></div>
+      <div class="cell" data-index="3"></div><div class="cell" data-index="4"></div><div class="cell" data-index="5"></div>
+      <div class="cell" data-index="6"></div><div class="cell" data-index="7"></div><div class="cell" data-index="8"></div>
+    </div>
+    <div class="controls">
+      <button id="resetRoundBtn" class="btn primary">Next Round</button>
+      <button id="resetGameBtn" class="btn secondary">Reset Game</button>
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body></html>
+
+What?
+We are assembling the 9 interactive board cells, reset buttons, and linking the game script.
+
+Where?
+Below the scoreboard in #board, closing out index.html with a script tag before </body>.
+
+How?
+By giving each cell a data-index="0" to "8" attribute, mapping every DOM cell directly to an array position in JavaScript.
+
+Why?
+Custom data attributes allow one centralized click handler to look up any cell's coordinate without traversing the DOM.
+
+
+
+CSS Styling: Variables, Layout & Header
+Step 5 · Color Tokens & Reset
+style.css
+:root {
+  --bg-color: #0f172a;
+  --card-bg: #1e293b;
+  --cell-bg: #334155;
+  --cell-hover: #475569;
+  --text-main: #f8fafc;
+  --color-x: #38bdf8;
+  --color-o: #f43f5e;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+What?
+We are creating centralized color tokens for a modern dark mode and removing browser margin quirks.
+
+Where?
+At the very top of style.css inside the pseudo-class :root and the universal * selector.
+
+How?
+Using CSS variables (--color-x, etc.) for easy theming, paired with box-sizing: border-box to keep borders and paddings contained.
+
+Why?
+Tokens prevent hex-code repetition across files, and resetting box-sizing prevents accidental horizontal page scrolling.
+
+
+
+
+Step 6 · Body Centering & Container
+style.css
+body {
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  font-family: system-ui, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+}
+.game-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  width: 100%;
+  max-width: 400px;
+}
+
+What?
+We are vertically and horizontally centering the entire game on any screen size.
+
+Where?
+In style.css, targeting the top-level body and .game-container elements.
+
+How?
+By using display: flex, min-height: 100vh, and align-items: center on the body, with a max-width: 400px constraint on the card.
+
+Why?
+A centered column gives users an arcade-cabinet focus while preventing wide-screen distortion on large desktop monitors.
+
+
+
+
+Step 7 · Status Banner & Scoreboard Styling
+style.css
+.status-banner { font-size: 1.25rem; font-weight: 600; height: 1.8rem; }
+.scoreboard { display: flex; width: 100%; gap: 0.75rem; }
+.score-card {
+  flex: 1; background: var(--card-bg); padding: 0.6rem;
+  border-radius: 8px; text-align: center;
+}
+.score-card .label { font-size: 0.75rem; text-transform: uppercase; opacity: 0.8; }
+.score-card .score { font-size: 1.4rem; font-weight: 700; display: block; }
+.player-x .label { color: var(--color-x); }
+.player-o .label { color: var(--color-o); }
+
+What?
+We are stabilizing the layout against text shifts and styling the 3 score summary boxes.
+
+Where?
+Directly following the container styles in style.css.
+
+How?
+Giving .status-banner a fixed height of 1.8rem prevents board jumping, and flex: 1 divides the scoreboard cards equally.
+
+Why?
+If the status banner had dynamic height, switching from a short message to a long win message would jarringly bump the board downward.
+
+
+
+CSS Grid Board & JavaScript Setup
+Step 8 · 3x3 CSS Grid & Square Cells
+style.css
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+}
+.cell {
+  background: var(--cell-bg);
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 3.2rem;
+  font-weight: 800;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s, transform 0.1s;
+}
+.cell:hover:not(.taken) { background: var(--cell-hover); transform: scale(0.98); }
+.cell.taken { cursor: not-allowed; }
+.cell.x { color: var(--color-x); }
+.cell.o { color: var(--color-o); }
+.cell.win-cell { background-color: #22c55e; color: #ffffff; }
+
+
+What?
+We are constructing the 3x3 square playfield and adding visual states for clicks, marks, and wins.
+
+Where?
+In style.css under the board and cell rules.
+
+How?
+Using display: grid with repeat(3, 1fr) and aspect-ratio: 1 / 1 to guarantee a perfect square, with .win-cell painted green.
+
+Why?
+CSS Grid handles two-dimensional sizing natively without hardcoded pixel heights, staying square on mobile and desktop.
+
+
+
+Step 9 · Buttons & JavaScript DOM Selectors
+style.css & script.js
+/* style.css controls */
+.controls { display: flex; gap: 0.8rem; width: 100%; }
+.btn { flex: 1; padding: 0.75rem; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
+.btn.primary { background: var(--color-x); color: #0f172a; }
+.btn.secondary { background: var(--card-bg); color: var(--text-main); border: 1px solid #475569; }
+
+
+// script.js DOM Selectors
+const cells = document.querySelectorAll(".cell");
+const statusText = document.getElementById("statusText");
+const scoreXEl = document.getElementById("scoreX");
+const scoreOEl = document.getElementById("scoreO");
+const scoreTieEl = document.getElementById("scoreTie");
+const resetRoundBtn = document.getElementById("resetRoundBtn");
+const resetGameBtn = document.getElementById("resetGameBtn");
+
+
+What?
+We are styling the interactive action buttons and caching DOM references in memory.
+
+Where?
+Completing style.css and opening script.js at line 1.
+
+How?
+Using querySelectorAll for the cells and getElementById for buttons and scorecards to avoid repeated DOM queries.
+
+Why?
+Caching node pointers once at script initialization improves performance and prevents repetitive document queries during clicks.
+Step 10 · Winning Combinations & State
+
+
+
+script.js
+const WIN_COMBOS = [
+  [0, 1, 2], [3, 4, 5], [6, 7, 8], // 3 Rows
+  [0, 3, 6], [1, 4, 7], [2, 5, 8], // 3 Columns
+  [0, 4, 8], [2, 4, 6]           // 2 Diagonals
+];
+
+let board = ["", "", "", "", "", "", "", "", ""];
+let currentPlayer = "X";
+let isGameActive = true;
+let scoreX = 0, scoreO = 0, scoreTies = 0;
+
+What?
+We are defining our 8 win conditions and establishing the single source of truth for the game state.
+
+Where?
+In script.js directly below our DOM element selectors.
+
+How?
+Through a constant 2D array of index triplets, paired with a 9-item string array and flags for active player and state.
+
+Why?
+Reading game state from a JavaScript array instead of scraping text from HTML elements ensures clean separation of logic from UI.
+
+
+
+JavaScript: Move Handling & Win Evaluation
+Step 11 · Event Binding & Click Guard Logic
+script.js
+cells.forEach(cell => cell.addEventListener("click", onCellClick));
+resetRoundBtn.addEventListener("click", resetRound);
+resetGameBtn.addEventListener("click", resetGame);
+
+function onCellClick(e) {
+  const idx = parseInt(e.target.dataset.index);
+
+  // Guard: Reject move if space is taken or game is over
+  if (board[idx] !== "" || !isGameActive) {
+    return;
+  }
+
+  // Update State array and UI element
+  board[idx] = currentPlayer;
+  e.target.textContent = currentPlayer;
+  e.target.classList.add("taken", currentPlayer.toLowerCase());
+
+  evaluateBoard();
+}
+
+What?
+We are listening for cell clicks and validating that the chosen tile is empty before applying a move.
+
+Where?
+In script.js inside the onCellClick function and cell listener loops.
+
+How?
+Reading e.target.dataset.index; early-returning if board[idx] !== ""; then updating both the array and CSS classes.
+
+Why?
+Guard clauses prevent overwriting existing moves and stop users from continuing to play after a round has concluded.
+
+
+
+Step 12 · Win Check, Draw & Turn Switching
+script.js
+function evaluateBoard() {
+  let won = false;
+  let line = [];
+
+  for (const [a, b, c] of WIN_COMBOS) {
+    if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+      won = true;
+      line = [a, b, c];
+      break;
+    }
+  }
+
+  if (won) {
+    isGameActive = false;
+    line.forEach(i => cells[i].classList.add("win-cell"));
+    statusText.textContent = `Player ${currentPlayer} Wins!`;
+    currentPlayer === "X" ? scoreXEl.textContent = ++scoreX : scoreOEl.textContent = ++scoreO;
+    return;
+  }
+
+  if (!board.includes("")) {
+    isGameActive = false;
+    statusText.textContent = "Round ended in a Draw!";
+    scoreTieEl.textContent = ++scoreTies;
+    return;
+  }
+
+  // Toggle Turn
+  currentPlayer = currentPlayer === "X" ? "O" : "X";
+  statusText.textContent = `Player ${currentPlayer}'s Turn`;
+}
+
+What?
+We are testing if the current move completed a line, filled the board without a winner, or passes the turn.
+
+Where?
+Inside the evaluateBoard function called at the end of every valid click.
+
+How?
+Destructuring [a, b, c] over WIN_COMBOS, halting inputs with isGameActive = false on win/draw, or toggling X and O.
+
+Why?
+Checking win patterns before checking for empty slots ensures that a 9th-move win is credited as a victory rather than mistaken for a draw.
+
+
+
+Reset Functions & Screen Recording Checklist
+Step 13 · Round Reset vs Full Game Reset
+script.js
+function resetRound() {
+  board.fill("");
+  isGameActive = true;
+  currentPlayer = "X";
+  statusText.textContent = "Player X's Turn";
+  cells.forEach(cell => {
+    cell.textContent = "";
+    cell.className = "cell";
+  });
+}
+
+function resetGame() {
+  resetRound();
+  scoreX = 0; scoreO = 0; scoreTies = 0;
+  scoreXEl.textContent = "0";
+  scoreOEl.textContent = "0";
+  scoreTieEl.textContent = "0";
+}
+
+What?
+We are providing a soft reset for consecutive matches and a hard reset that clears scores.
+
+Where?
+At the bottom of script.js wired to the two bottom control buttons.
+
+How?
+board.fill("") empties board memory, className = "cell" strips styling, and resetGame zeroes the scoreboard numbers.
+
+Why?
+Separating round clearing from match score clearing avoids frustrating players who want multi-round competitions without tally loss.
+
+
+
+
+Step 14 · Final Testing On-Camera Checklist
+Browser Live Demo
+What?
+Demonstrating all game behaviors live in the browser to prove code correctness to viewers.
+Where?
+In your browser window via Live Server side-by-side with your code editor.
+How?
+By following this 5-point verification routine on camera:
+Why?
+Testing edge cases on camera shows viewers how to debug unexpected behaviors and proves the code works end-to-end.
